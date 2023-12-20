@@ -1,10 +1,3 @@
-//
-//  ContentView.swift
-//  Simon
-//
-//  Created by Caden Christesen on 11/13/23.
-//
-
 import SwiftUI
 
 struct ContentView: View {
@@ -13,12 +6,17 @@ struct ContentView: View {
     @State private var sequence: [Int] = []
     @State private var index: Int = 0
     @State private var timer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
-    
+    @State private var isPlayingSequence = false
+
     var body: some View {
         VStack {
             Text("Simon")
                 .font(.system(size: 72))
-            HStack{
+            Button("Start") {
+                startGame()
+            }
+            .disabled(isPlayingSequence)
+            HStack {
                 colorDisplay[0]
                     .opacity(flash[0] ? 1 : 0.4)
                     .onTapGesture {
@@ -30,7 +28,7 @@ struct ContentView: View {
                         flashColorDisplay(index: 1)
                     }
             }
-            HStack{
+            HStack {
                 colorDisplay[2]
                     .opacity(flash[2] ? 1 : 0.4)
                     .onTapGesture {
@@ -45,24 +43,33 @@ struct ContentView: View {
             .preferredColorScheme(.dark)
         }
         .onReceive(timer) { _ in
-            if index < sequence.count {
-                flashColorDisplay(index: sequence[index])
-                index += 1
-            } else {
-                index = 0
-                sequence.append(Int.random(in: 0...3))
+            if isPlayingSequence {
+                if index < sequence.count {
+                    flashColorDisplay(index: sequence[index])
+                    index += 1
+                } else {
+                    index = 0
+                    sequence.append(Int.random(in: 0...3))
+                    isPlayingSequence = false
+                }
             }
         }
     }
-    
+
     func flashColorDisplay(index: Int) {
         flash[index].toggle()
         withAnimation(.easeInOut(duration: 0.5)) {
             flash[index].toggle()
         }
     }
-    
+
+    func startGame() {
+        index = 0
+        sequence = [Int.random(in: 0...3)]
+        isPlayingSequence = true
+    }
 }
+
 struct ColorDisplay: View {
     let color: Color
     var body: some View {
@@ -73,6 +80,8 @@ struct ColorDisplay: View {
     }
 }
 
-#Preview {
-    ContentView()
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
 }
