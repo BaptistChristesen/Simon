@@ -79,7 +79,6 @@ struct ContentView: View {
             }
         } else {
             print("Game Over")
-            startGame()
         }
     }
     func flashColorDisplay(index: Int) {
